@@ -22,10 +22,10 @@ logging.basicConfig(
 
 # 基础 URL 和文件路径
 BASE_URL = "https://www.themoviedb.org/movie/"
-MOVIE_CSV_PATH = "data/movies.csv"
-LINK_CSV_PATH = "data/links.csv"
+MOVIE_CSV_PATH = "movies.csv"
+LINK_CSV_PATH = "links.csv"
 OUTPUT_FILE = "movie_id_to_name.csv"
-REMAINING_FILE = "data/for_movies_name.csv"
+REMAINING_FILE = "for_movies_name.csv"
 
 # 检查并复制 movies.csv 为 for_movies_name.csv
 if not os.path.exists(REMAINING_FILE):
@@ -124,21 +124,24 @@ def process_movies_with_edge(movie_csv_path, link_csv_path):
             next(reader)  # 跳过标题行
             for row in reader:
                 movie_id = row[0]
-                logging.info(f"开始处理电影 ID：{movie_id}")
+                try:
+                    logging.info(f"开始处理电影 ID：{movie_id}")
 
-                # 获取 tmdbID
-                tmdb_id = get_tmdb_id(movie_id, link_csv_path)
-                if not tmdb_id:
-                    logging.warning(f"在 link.csv 中找不到电影 ID {movie_id} 的 tmdbID，跳过。")
-                    continue
+                    # 获取 tmdbID
+                    tmdb_id = get_tmdb_id(movie_id, link_csv_path)
+                    if not tmdb_id:
+                        logging.warning(f"在 link.csv 中找不到电影 ID {movie_id} 的 tmdbID，跳过。")
+                        continue
 
-                # 使用 Edge 浏览器获取电影名称
-                movie_name = get_movie_name_with_edge(movie_id, tmdb_id, driver)
-                if movie_name:
-                    save_to_output(movie_id, movie_name)
-                    remove_processed_movie(movie_id)  # 删除已处理的条目
-                else:
-                    logging.warning(f"电影 ID {movie_id} 未成功获取名称，跳过。")
+                    # 使用 Edge 浏览器获取电影名称
+                    movie_name = get_movie_name_with_edge(movie_id, tmdb_id, driver)
+                    if movie_name:
+                        save_to_output(movie_id, movie_name)
+                        remove_processed_movie(movie_id)  # 删除已处理的条目
+                    else:
+                        logging.warning(f"电影 ID {movie_id} 未成功获取名称，跳过。")
+                except Exception as e:
+                    logging.error(f"处理电影 ID {movie_id} 时发生错误：{e}")
     except Exception as e:
         logging.error(f"读取 {REMAINING_FILE} 文件时出错：{e}")
     finally:
