@@ -71,7 +71,7 @@ python missing_figure_statistic.py
 
 运行 `scraper.py` 脚本，使用 MovieLens 数据集下载 TMDb 上的电影海报：
 ```bash
-python scraper.py
+python get-movie-poster-scraper.py
 ```
 
 **功能**：

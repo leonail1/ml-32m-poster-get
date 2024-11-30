@@ -4,7 +4,6 @@ import requests
 from lxml import html
 import logging
 import time
-import random
 
 # 配置日志
 logging.basicConfig(
@@ -17,8 +16,8 @@ logging.basicConfig(
 
 BASE_URL = "https://www.themoviedb.org/movie/"
 OUTPUT_FOLDER = "movie_posters"
-MOVIE_CSV_PATH = "data/movies.csv"
-LINK_CSV_PATH = "data/links.csv"
+MOVIE_CSV_PATH = "movies-sample.csv"
+LINK_CSV_PATH = "links-sample.csv"
 MIN_TIME_PER_REQUEST = 10  # 每次请求的最小时间（秒）
 
 # 创建存储图片的文件夹
@@ -57,7 +56,7 @@ def download_poster(movie_id, tmdb_id):
     if os.path.exists(image_path):
         logging.info(f"电影 {movie_id} 的图片已存在，跳过下载。")
         skipped_movies += 1
-        return True
+        return False
 
     movie_url = f"{BASE_URL}{tmdb_id}"
     try:
@@ -107,16 +106,16 @@ def process_movies(movie_csv_path, link_csv_path):
                     success = download_poster(movie_id, tmdb_id)
                     if not success:
                         logging.warning(f"电影 ID {movie_id} 的图片下载失败。")
+                    else:
+                        # 如果下载成功，检查是否需要延时
+                        elapsed_time = time.time() - start_time
+                        if elapsed_time < MIN_TIME_PER_REQUEST:
+                            remaining_time = MIN_TIME_PER_REQUEST - elapsed_time
+                            logging.info(f"当前操作耗时 {elapsed_time:.2f} 秒，延时 {remaining_time:.2f} 秒以补足到 {MIN_TIME_PER_REQUEST} 秒")
+                            time.sleep(remaining_time)
                 else:
                     logging.warning(f"在 link.csv 中找不到电影 ID {movie_id} 的 tmdbID，跳过。")
                     errors += 1
-
-                # 计算处理时间并补足到指定最小时间
-                elapsed_time = time.time() - start_time
-                if elapsed_time < MIN_TIME_PER_REQUEST:
-                    remaining_time = MIN_TIME_PER_REQUEST - elapsed_time
-                    logging.info(f"当前操作耗时 {elapsed_time:.2f} 秒，延时 {remaining_time:.2f} 秒以补足到 {MIN_TIME_PER_REQUEST} 秒")
-                    time.sleep(remaining_time)
 
     except Exception as e:
         logging.error(f"处理电影海报下载任务时发生错误：{e}")
