@@ -87,7 +87,7 @@ def download_poster(movie_id, tmdb_id):
 
 def process_movies(movie_csv_path, link_csv_path):
     """
-    遍历 movies.csv，检查是否已下载图片，若无则下载
+    遍历 movies-sample.csv，检查是否已下载图片，若无则下载
     """
     global total_movies, errors
     try:
