@@ -17,8 +17,8 @@ logging.basicConfig(
 )
 
 BASE_URL = "https://www.themoviedb.org/movie/"
-MOVIE_CSV_PATH = "movies.csv"
-LINK_CSV_PATH = "links.csv"
+MOVIE_CSV_PATH = "movies-sample.csv"
+LINK_CSV_PATH = "links-sample.csv"
 OUTPUT_FILE = "movie_id_to_name.csv"
 MIN_TIME_PER_REQUEST = 10  # 每次请求的最小时间（秒）
 
@@ -96,7 +96,7 @@ def save_to_output(movie_id, movie_name):
 
 def process_movies_with_edge(movie_csv_path, link_csv_path, output_file):
     """
-    遍历 movies.csv 的第一列，根据 link.csv 查找 tmdbID 并获取电影名称
+    遍历 movies-sample.csv 的第一列，根据 link.csv 查找 tmdbID 并获取电影名称
     """
     options = Options()
     service = Service()
